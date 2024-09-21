@@ -27,6 +27,26 @@ pipeline {
                 sh 'docker build -t nagendraramoju/banking-project-demo .'
                }
          }
+          stage ('Docker-Login') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'Docker-login', passwordVariable: 'dockerpassword', usernameVariable: 'dockerlogin')]) {
+                   sh 'docker login -u ${dockerlogin} -p ${dockerpassword}'
+                 }
+             }
+  }
+          stage('push-Image') {
+             steps {
+             sh 'docker push nagendraramoju/banking-project-demo'
+ }
+
+}     
+
+
+
+
+
+}
+
 
 
 
