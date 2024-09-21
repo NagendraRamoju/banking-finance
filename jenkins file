@@ -16,8 +16,19 @@ pipeline {
                 sh "mvn -Dmaven.test.failure.ignore=true clean package"
 
             }
-
-          
         }
-    }
+        stage ('Genarate Test Reports') {
+             steps {
+                 publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: '/var/lib/jenkins/workspace/project1/target/surefire-reports', reportFiles: 'index.html', reportName: 'HTML Report', reportTitles: '', useWrapperFileDirectly: true])
+      }
+}
+        stage ('Create Docker Image') {
+             steps {
+                sh 'docker build -t nagendraramoju/banking-project-demo .'
+               }
+         }
+
+
+      }
+
 }
