@@ -48,7 +48,7 @@ pipeline {
                sh 'sudo chmod 600 slavekey.pem'
                sh 'terraform init'
                sh 'terraform validate'
-               sh 'terraform apply --auto-approved'
+               sh 'terraform apply --auto-approve'
 }
 }
 }
