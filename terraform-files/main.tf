@@ -1,24 +1,24 @@
-resource "aws_instance" "New-test-server" {
-  ami           = "ami-0c101f26f147fa7fd" 
+resource "aws_instance" "test-server" {
+  ami           = "ami-0e86e20dae9224db8" 
   instance_type = "t2.micro" 
-  key_name = "learnawskey"
-  vpc_security_group_ids= ["sg-020a949c964fb36e9"]
+  key_name = "slavekey"
+  vpc_security_group_ids= ["sg-0135234a952876b5d"]
   connection {
     type     = "ssh"
-    user     = "ec2-user"
-    private_key = file("./learnawskey.pem")
+    user     = "ubuntu" 
+    private_key = file("./slavekey.pem")
     host     = self.public_ip
   }
   provisioner "remote-exec" {
     inline = [ "echo 'wait to start instance' "]
   }
   tags = {
-    Name = "New-test-server"
+    Name = "test-server"
   }
   provisioner "local-exec" {
-    command = "echo ${aws_instance.New-test-server.public_ip} > inventory"
+    command = "echo ${aws_instance.test-server.public_ip} > inventory"
   }
   provisioner "local-exec" {
-    command = "ansible-playbook /var/lib/jenkins/workspace/Banking-Project/terraform-files/ansibleplaybook.yml"
+    command = "ansible-playbook /var/lib/jenkins/workspace/project1/terraform-files/ansibleplaybook.yml"
          }
   }
