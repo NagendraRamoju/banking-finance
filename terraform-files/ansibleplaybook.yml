@@ -1,20 +1,52 @@
-- name: Docker configure in Ec2 Machine
+---
+- name: Docker configuration on EC2 Machine
   hosts: all
-  become : true
-  connection: ssh
+  become: yes
   tasks:
-  - name: updating the New Ec2 Machine 
-    command: sudo apt update
+    - name: Update the apt package index
+      apt:
+        update_cache: yes
 
-  - name: Install Docker
-    command: sudo apt install docker -y
-    become: yes
-    become_user: root
+    - name: Install required packages for Docker
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg-agent
+          - software-properties-common
+        state: present
 
-  - name: Start Docker service
-    command: sudo systemctl start docker
-    become: yes
-    become_user: root
+    - name: Add Docker's official GPG key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
 
-  - name: Deploy the Image and Run as Container
-    command: docker run -itd -p 8084:8081 nagendraramoju/banking-project-demo
+    - name: Set up the Docker repository
+      apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable
+        state: present
+
+    - name: Install Docker
+      apt:
+        name: docker-ce
+        state: present
+
+    - name: Start Docker service
+      systemd:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Pull the Docker image
+      docker_image:
+        name: nagendraramoju/banking-project-demo
+        source: pull
+
+    - name: Run the Docker container
+      docker_container:
+        name: banking_demo
+        image: nagendraramoju/banking-project-demo
+        state: started
+        ports:
+          - "8084:8081"
